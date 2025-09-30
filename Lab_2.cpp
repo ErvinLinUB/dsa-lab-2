@@ -30,9 +30,39 @@ void printUsers(User* head);
 bool authorize(User* head, const string& username, const string& action);
 
 int main() {
-  
-    // Write code here to test your implementation
-    
+    User* head = nullptr;
+
+    // Insert users with role-based permissions
+    insertUser(head, "Alice", "123"); // default viewer: {"view"}
+    insertUser(head, "John", "123", {"view", "edit", "create"}); // editor
+    insertUser(head, "Charles", "123", {"view", "edit", "create", "delete"}); // admin
+
+    // Print all users
+    cout << "Users in list:" << endl;
+    printUsers(head);
+    cout << endl;
+
+    // Authorization tests
+    cout << boolalpha; // print true/false instead of 1/0
+
+    cout << "Alice (viewer)" << endl;
+    cout << "Alice can view? " << authorize(head, "Alice", "view") << endl;
+    cout << "Alice can edit? " << authorize(head, "Alice", "edit") << endl;
+
+    cout << endl;
+
+    cout << "John (editor)" << endl;
+    cout << "John can create? " << authorize(head, "John", "create") << endl;
+    cout << "John can delete? " << authorize(head, "John", "delete") << endl;
+
+    cout << endl;
+
+    cout << "Charles (admin)" << endl;
+    cout << "Charles can edit? " << authorize(head, "Charles", "edit") << endl;
+    cout << "Charles can delete? " << authorize(head, "Charles", "delete") << endl;
+
+    cout << endl;
+
     return 0;
 }
 

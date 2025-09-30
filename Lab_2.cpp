@@ -3,6 +3,7 @@
 // ADD HEADER FILES HERE
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 // -----------------------------
@@ -11,19 +12,19 @@ using namespace std;
 struct User {
     string username;
     string password;
-    string role;
+    vector<string> permissions;
     User *next;
     
-    User(string u, string p, const string &r = "viewer") {
+    User(string u, string p, const vector<string> &perms = {"view"}) {
         username = u;
         password = p;
-        role = r;
+        permissions = perms;
         next = nullptr;
     }
 };
 
 // Function prototypes:
-bool insertUser(User *&head, const string &username, const string &password, const string &role = "viewer");
+bool insertUser(User *&head, const string &username, const string &password, const vector<string> &permissions = {"view"});
 User* findUser(User *head, const string &username);
 void printUsers(User* head);
 bool authorize(User* head, const string& username, const string& action);
@@ -42,12 +43,10 @@ int main() {
 // Inserts a new (username, password) at the END of the list.
 // If username already exists, do NOT insert a duplicate; return false.
 // Otherwise insert and return true.
-bool insertUser(User *&head, const string &username, const string &password, const string &role = "viewer") {
-    // TODO: implement
-    
+bool insertUser(User *&head, const string &username, const string &password, const vector<string> &permissions) {
     User *curr = head;
 
-    // Checks for duplicates.
+    // Checks for duplicates
     while (curr != nullptr) {
         if (curr->username == username) {
             return false;
@@ -55,10 +54,10 @@ bool insertUser(User *&head, const string &username, const string &password, con
         curr = curr->next;
     }
 
-    // Creates a new user node.
-    User *newUser = new User(username, password, role);
+    // Create new user with permissions
+    User *newUser = new User(username, password, permissions);
 
-    // Places new user node at the front (if list is empty) or at the end (if list already has nodes).
+    // Insert at head if empty, else append at end
     if (head == nullptr) {
         head = newUser;
     } else {
@@ -108,23 +107,11 @@ bool authorize(User* head, const string& username, const string& action) {
         return false;
     }
 
-    if (user->role == "admin") {
-        return true;
-    } 
-    else if (user->role == "editor") {
-        if (action == "view" || action == "edit" || action == "create") {
+    for (const string& perm : user->permissions) {
+        if (perm == action) {
             return true;
-        } else {
-            return false;
         }
-    } 
-    else if (user->role == "viewer") {
-        if (action == "view") {
-            return true;
-        } else {
-            return false;
-        }
-    } 
+    }
 
     return false;
 }
